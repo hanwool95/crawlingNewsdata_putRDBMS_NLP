@@ -56,10 +56,9 @@ def crawling_sub_areas(sub_areas, comparing_origin_title, i):
     for area in sub_areas:
         sub_title = area.select("a.elss.sub_tit")[0]["title"]
         comparing_title = replace_string_stopword(sub_title)
-        if comparing_origin_title == comparing_title:
+        if (comparing_origin_title == comparing_title) and area.select("a.sub_txt"):
             indice.append(i)
             titles.append(sub_title)
-
             if "네이버뉴스" in area.select("a.sub_txt")[0].get_text():
                 print("find sub naver news")
                 print(sub_title)
@@ -196,13 +195,11 @@ def total_crawling_process(result_df, page_urls_naver, origin_titles):
 def main():
     rawdata['수정제목'] = rawdata.iloc[:, 2].str.replace('\'|"|`|“|‘|”|’', '', regex=True)
 
-    result_df = rawdata.loc[0:9,]
+    page_urls_naver = get_pageurls_from_df(rawdata)
 
-    page_urls_naver = get_pageurls_from_df(result_df)
+    origin_titles = rawdata['제목']
 
-    origin_titles = result_df['제목']
-
-    result_df, result_naver, comment_naver = total_crawling_process(result_df, page_urls_naver, origin_titles)
+    result_df, result_naver, comment_naver = total_crawling_process(rawdata, page_urls_naver, origin_titles)
 
     csv_out(result_df, result_naver, comment_naver)
 
